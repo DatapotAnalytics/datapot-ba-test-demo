@@ -45,20 +45,32 @@ Bạn được yêu cầu phân tích và prototype một **hệ thống quản 
 
 ## 4. Skills & công cụ theo từng phase
 
-> Bạn được khuyến khích dùng Claude ở mọi phase. Bảng dưới chỉ rõ **kỹ năng BA cốt lõi** và **task cụ thể nên giao cho Claude** ở từng bước.
+> Bạn được khuyến khích dùng Claude Code ở mọi phase. Bảng dưới chỉ rõ **Claude skill cụ thể** (`/skill-name`) nên gọi ở từng bước — không chỉ "dùng AI" chung chung.
 
-| Phase | Kỹ năng BA cốt lõi | Tool khác | Dùng Claude để… |
+| Phase | Kỹ năng BA cốt lõi | Claude Skill | Gọi skill để làm gì |
 |---|---|---|---|
-| **00** Dataset Contract | System boundary analysis · Data contract design | Notion | Phân tích đề bài → liệt kê entity upstream cần cung cấp, fields, types, constraints; phân biệt bước 1 tạo gì vs bước 3 cập nhật gì |
-| **01** Requirements | Problem framing · Scope negotiation · Stakeholder analysis | Notion | Từ đề bài + dataset contract → draft actors, functional requirements từng bước, non-functional requirements; sinh ra 5 câu hỏi cần hỏi thêm stakeholder |
-| **02** User Stories | Story mapping · BDD · MoSCoW prioritization | Jira / Linear | Draft stories theo Given/When/Then → sau đó hỏi: *"Story này AC còn thiếu điều kiện gì? Đã có unhappy path chưa?"* |
-| **03** Process Flow | BPMN · Swimlane · Decision tree | Miro · Lucidchart | Mô tả luồng bằng text → generate Mermaid flowchart → hỏi tiếp: *"Luồng này bỏ sót nhánh nào?"* |
-| **04** Data Model | ER modeling · Normalization · Cardinality | dbdiagram.io | Từ contract + stories → generate Mermaid erDiagram → review: normalization issues, entity còn thiếu để support state transitions |
-| **05** Screen Spec | Information architecture · UX thinking | Figma · Whimsical | Từ stories từng bước → spec màn hình: *câu hỏi nghiệp vụ cần trả lời, data fields, actions, filters, empty state, error state* |
-| **Prototype** | HTML · CSS · Vanilla JS | VS Code · Chrome DevTools | Paste screen spec → generate khung HTML/CSS/JS với dữ liệu mẫu, TODO comments chỗ cần hoàn thiện; iterate từng màn một |
+| **00** Dataset Contract | System boundary analysis · Data contract design | `/deep-research` | Research domain: entity nào upstream thường expose, pattern contract phổ biến cho scheduling system, câu hỏi cần hỏi stakeholder để làm rõ ranh giới hệ thống |
+| **01** Requirements | Problem framing · Scope negotiation | `/deep-research` | Research bài toán: best practice requirements cho hệ thống xác nhận lịch, edge cases phổ biến trong approval workflow, non-functional requirements nên có |
+| **02** User Stories | Story mapping · BDD · MoSCoW | *(Claude trực tiếp)* | Draft Given/When/Then, rồi prompt: *"Challenge AC của story này — điều kiện nào còn thiếu, unhappy path nào chưa có?"* |
+| **03** Process Flow | BPMN · Swimlane · Decision tree | *(Claude trực tiếp)* | Mô tả luồng bằng text → generate Mermaid flowchart → hỏi: *"Nhánh nào bị bỏ sót?"* Render kết quả trên [mermaid.live](https://mermaid.live) để kiểm tra |
+| **04** Data Model | ER modeling · Normalization · Cardinality | *(Claude trực tiếp)* | Generate Mermaid erDiagram từ entity list → review normalization, cardinality, missing entity để support state transitions |
+| **05** Screen Spec | Information architecture · UX thinking | `/artifact-design` | Gọi `/artifact-design` để Claude hướng dẫn thiết kế layout, hierarchy, palette cho từng màn trước khi code. Output: wireframe Artifact có thể share với team |
+| **Prototype — build** | HTML · CSS · Vanilla JS | *(Claude Code trực tiếp)* | Paste screen spec → Claude generate khung HTML/CSS/JS, dữ liệu mẫu, TODO comments. Iterate từng màn một |
+| **Prototype — test** | Manual testing · Role-based walkthrough | `/run` | Gọi `/run` để Claude khởi động và thao tác thử prototype trên browser — phát hiện lỗi UI mà đọc code không thấy |
+| **Prototype — review** | Code quality · Logic correctness | `/code-review` | Gọi `/code-review` sau khi hoàn thiện để Claude review: logic state management, edge cases chưa handle, code dư thừa |
+| **Prototype — verify** | Acceptance testing | `/verify` | Gọi `/verify` để Claude chạy lại từng luồng theo AC trong user stories, xác nhận prototype đáp ứng đúng yêu cầu trước khi nộp |
 
-> **Lưu ý đánh giá:** Reviewer đánh giá **tư duy phân tích và lý luận nghiệp vụ** của bạn — không phải khả năng prompt AI.
-> Nội dung Claude generate nhưng không có dấu ấn phân tích cá nhân sẽ dễ nhận ra. Hãy dùng Claude như một sparring partner: draft nhanh → bạn challenge lại → iterate.
+**Cách gọi skill trong Claude Code:**
+```
+/deep-research      # research domain, best practices, edge cases
+/artifact-design    # thiết kế layout & visual spec cho màn hình
+/run                # chạy và thao tác thử prototype trên browser
+/code-review        # review code prototype sau khi hoàn thiện
+/verify             # xác nhận prototype đáp ứng đúng AC
+```
+
+> **Lưu ý đánh giá:** Reviewer đánh giá **tư duy phân tích và lý luận nghiệp vụ** — không phải khả năng gọi skill.
+> Skill giúp bạn làm nhanh hơn và chắc hơn; nhưng nội dung trong `docs/` phải phản ánh suy luận của bạn, không phải output thô từ Claude.
 
 ---
 
