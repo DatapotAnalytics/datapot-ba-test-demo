@@ -45,32 +45,121 @@ Bạn được yêu cầu phân tích và prototype một **hệ thống quản 
 
 ## 4. Skills & công cụ theo từng phase
 
-> Bạn được khuyến khích dùng Claude Code ở mọi phase. Bảng dưới chỉ rõ **Claude skill cụ thể** (`/skill-name`) nên gọi ở từng bước — không chỉ "dùng AI" chung chung.
+> Dùng Claude Code trong toàn bộ vòng đời bài làm. Bảng dưới ánh xạ từng giai đoạn sang **skill command cụ thể** — theo đúng thứ tự nên gọi.
 
-| Phase | Kỹ năng BA cốt lõi | Claude Skill | Gọi skill để làm gì |
-|---|---|---|---|
-| **00** Dataset Contract | System boundary analysis · Data contract design | `/deep-research` | Research domain: entity nào upstream thường expose, pattern contract phổ biến cho scheduling system, câu hỏi cần hỏi stakeholder để làm rõ ranh giới hệ thống |
-| **01** Requirements | Problem framing · Scope negotiation | `/deep-research` | Research bài toán: best practice requirements cho hệ thống xác nhận lịch, edge cases phổ biến trong approval workflow, non-functional requirements nên có |
-| **02** User Stories | Story mapping · BDD · MoSCoW | *(Claude trực tiếp)* | Draft Given/When/Then, rồi prompt: *"Challenge AC của story này — điều kiện nào còn thiếu, unhappy path nào chưa có?"* |
-| **03** Process Flow | BPMN · Swimlane · Decision tree | *(Claude trực tiếp)* | Mô tả luồng bằng text → generate Mermaid flowchart → hỏi: *"Nhánh nào bị bỏ sót?"* Render kết quả trên [mermaid.live](https://mermaid.live) để kiểm tra |
-| **04** Data Model | ER modeling · Normalization · Cardinality | *(Claude trực tiếp)* | Generate Mermaid erDiagram từ entity list → review normalization, cardinality, missing entity để support state transitions |
-| **05** Screen Spec | Information architecture · UX thinking | `/artifact-design` | Gọi `/artifact-design` để Claude hướng dẫn thiết kế layout, hierarchy, palette cho từng màn trước khi code. Output: wireframe Artifact có thể share với team |
-| **Prototype — build** | HTML · CSS · Vanilla JS | *(Claude Code trực tiếp)* | Paste screen spec → Claude generate khung HTML/CSS/JS, dữ liệu mẫu, TODO comments. Iterate từng màn một |
-| **Prototype — test** | Manual testing · Role-based walkthrough | `/run` | Gọi `/run` để Claude khởi động và thao tác thử prototype trên browser — phát hiện lỗi UI mà đọc code không thấy |
-| **Prototype — review** | Code quality · Logic correctness | `/code-review` | Gọi `/code-review` sau khi hoàn thiện để Claude review: logic state management, edge cases chưa handle, code dư thừa |
-| **Prototype — verify** | Acceptance testing | `/verify` | Gọi `/verify` để Claude chạy lại từng luồng theo AC trong user stories, xác nhận prototype đáp ứng đúng yêu cầu trước khi nộp |
+### 4.1 Bản đồ skill theo vòng đời
 
-**Cách gọi skill trong Claude Code:**
+| Giai đoạn | Claude Skill | Gọi khi nào & để làm gì |
+|---|---|---|
+| **Khởi động repo** | `/init` | Việc đầu tiên sau khi fork & clone. Claude đọc toàn bộ repo → sinh `CLAUDE.md` ghi lại cấu trúc, mục đích từng file, quy ước. Mọi lệnh Claude tiếp theo sẽ có context chính xác hơn. |
+| **00 Dataset Contract** | `/deep-research` | Research multi-source: entity nào scheduling system upstream thường expose, pattern data contract cho approval workflow, câu hỏi stakeholder interview cần hỏi. Claude fan-out 5 góc tìm kiếm, verify chéo các claim, trả về report có trích dẫn. |
+| **01 Requirements** | `/deep-research` | Research: best practice requirements cho confirmation + change-request workflow, non-functional requirements phổ biến (SLA thông báo, retry logic), edge cases thường bị bỏ sót trong hệ thống lịch. |
+| **02 User Stories** | *(Claude trực tiếp)* | Draft Given/When/Then → prompt *"Challenge AC này: điều kiện nào còn thiếu, unhappy path nào chưa cover?"* Không cần skill riêng — lặp nhanh hơn khi chat trực tiếp. |
+| **03 Process Flow** | *(Claude trực tiếp)* | Mô tả luồng bằng text → Claude generate Mermaid. Paste vào [mermaid.live](https://mermaid.live) để preview. Hỏi tiếp: *"Luồng này bỏ sót nhánh nào?"* |
+| **04 Data Model** | *(Claude trực tiếp)* | Generate `erDiagram` Mermaid → review normalization, cardinality, entity còn thiếu để support state machine. |
+| **05 Screen Spec** | `/artifact-design` | Claude đọc screen spec của bạn → trả về hướng dẫn palette, typography, layout hierarchy phù hợp với từng màn (dashboard scan-first vs. form flow vs. calendar grid). Output có thể publish thành Artifact để share với team. |
+| **Prototype — build** | *(Claude Code trực tiếp)* | Paste screen spec → Claude generate HTML/CSS/JS với dữ liệu mẫu và `// TODO:` comments. Iterate từng màn, commit sau mỗi màn hoàn thiện. |
+| **Prototype — chạy thử** | `/run` | Claude mở `prototype/index.html` trên browser, thao tác thử từng role (GV → xác nhận, Coordinator → phê duyệt...), báo cáo lỗi UI mà đọc code không thấy. |
+| **Prototype — dọn code** | `/simplify` | Sau khi tất cả luồng chạy đúng, gọi `/simplify` để Claude tìm và **tự áp dụng** các cleanup: code trùng lặp, biến thừa, logic rối. Không sửa bug — chỉ làm sạch. |
+| **Prototype — review code** | `/code-review` | Chạy `/code-review --effort high` để Claude review kỹ: logic state management, edge cases chưa handle, XSS từ user input. Dùng `--fix` để Claude tự vá các lỗi tìm thấy. |
+| **Prototype — security** | `/security-review` | Chạy trước khi nộp bài. Claude kiểm tra: lý do từ chối / lý do thay đổi được render có escape HTML không, input validation, dữ liệu mẫu có lộ thông tin nhạy cảm không. |
+| **Prototype — verify AC** | `/verify` | Claude chạy lại từng luồng theo đúng Acceptance Criteria trong `docs/02-user-stories.md` — xác nhận prototype đáp ứng đủ trước khi push lần cuối. |
+| **Nộp bài — pre-submit** | `/review` | Sau khi push, gọi `/review` để Claude đọc PR diff như một reviewer độc lập: docs có nhất quán với prototype không, checklist có đủ không, commit history có kể được câu chuyện tư duy không. |
+
+---
+
+### 4.2 Chi tiết từng skill
+
+**`/init` — Khởi tạo context cho Claude**
+Chạy ngay sau `git clone`. Claude đọc toàn bộ repo và viết `CLAUDE.md` mô tả cấu trúc, mục đích từng file, quy ước đặt tên. Kết quả: mọi lần bạn hỏi Claude trong phiên sau đều có context đúng mà không cần giải thích lại.
+
 ```
-/deep-research      # research domain, best practices, edge cases
-/artifact-design    # thiết kế layout & visual spec cho màn hình
-/run                # chạy và thao tác thử prototype trên browser
-/code-review        # review code prototype sau khi hoàn thiện
-/verify             # xác nhận prototype đáp ứng đúng AC
+/init
 ```
 
-> **Lưu ý đánh giá:** Reviewer đánh giá **tư duy phân tích và lý luận nghiệp vụ** — không phải khả năng gọi skill.
-> Skill giúp bạn làm nhanh hơn và chắc hơn; nhưng nội dung trong `docs/` phải phản ánh suy luận của bạn, không phải output thô từ Claude.
+---
+
+**`/deep-research` — Research có trích dẫn, verify chéo**
+Không phải "hỏi Claude một câu". Skill này fan-out 5 search agent song song trên nhiều góc độ, fetch 15+ nguồn, adversarially verify từng claim (3 vote — cần 2/3 refute để loại), rồi tổng hợp report có cite nguồn. Dùng khi bạn cần **sự thật đã được kiểm chứng**, không phải ý kiến.
+
+```
+/deep-research "best practices for schedule confirmation workflow in education management systems"
+/deep-research "common edge cases in calendar change-request approval systems"
+```
+
+---
+
+**`/artifact-design` — Thiết kế visual cho màn hình**
+Gọi khi bạn đã có screen spec text và cần hướng dẫn thiết kế thực sự: Claude phân tích nội dung màn hình và trả về palette, font pairing, layout grid, spacing scale phù hợp — không template, không generic. Có thể output thành Artifact HTML để share.
+
+```
+/artifact-design      # sau đó paste nội dung screen spec vào
+```
+
+---
+
+**`/run` — Chạy và quan sát prototype**
+Claude tự mở `prototype/index.html`, thao tác như người dùng thật (click Xác nhận, mở modal Từ chối, gửi yêu cầu thay đổi, switch role Coordinator...), và báo cáo những gì thấy trên màn hình. Phát hiện lỗi hiển thị, state không reset, nút không phản hồi — những thứ đọc code không thấy.
+
+```
+/run
+```
+
+---
+
+**`/simplify` — Dọn sạch code, tự áp dụng fix**
+Sau khi prototype chạy đúng, skill này tìm: hàm trùng lặp, biến không dùng, logic rối, render thừa — rồi **tự sửa** vào file. Không săn bug (dùng `/code-review` cho việc đó). Mục tiêu: code đọc được, không cần giải thích.
+
+```
+/simplify
+```
+
+---
+
+**`/code-review` — Review kỹ lỗi logic và quality**
+Review diff hiện tại. Có 3 flag hữu ích:
+- Không flag: medium effort — các lỗi rõ ràng.
+- `--effort high`: broad coverage, bao gồm cả lỗi tinh vi.
+- `--fix`: tự vá luôn các lỗi tìm thấy.
+- `--comment`: post findings thành inline PR comments trên GitHub.
+
+```
+/code-review --effort high
+/code-review --fix          # tự vá
+/code-review --comment      # gắn comment lên PR
+```
+
+---
+
+**`/security-review` — Kiểm tra bảo mật trước khi nộp**
+Quan trọng với prototype này vì có nhiều chỗ render user input ra HTML (lý do từ chối, lý do thay đổi lịch). Claude kiểm tra XSS, injection, dữ liệu mẫu có expose thông tin nhạy cảm không. Chạy một lần trước khi push lần cuối.
+
+```
+/security-review
+```
+
+---
+
+**`/verify` — Xác nhận prototype đáp ứng đúng AC**
+Claude đọc Acceptance Criteria trong `docs/02-user-stories.md` rồi chạy prototype để verify từng điều kiện Given/When/Then. Khác `/run` ở chỗ: đây là **test có spec**, không phải khám phá tự do.
+
+```
+/verify
+```
+
+---
+
+**`/review` — Đọc PR như reviewer độc lập**
+Sau khi push và tạo PR trên GitHub, gọi `/review` để Claude đọc toàn bộ diff và đánh giá: docs có nhất quán với prototype không, commit history có kể được tiến trình tư duy không, checklist có mục nào thiếu không. Làm trước khi gửi link cho BTC.
+
+```
+/review
+```
+
+---
+
+> **Lưu ý:** Reviewer đánh giá **tư duy phân tích** — không phải số skill đã gọi.
+> Skill giúp bạn làm nhanh hơn và chắc hơn, nhưng nội dung trong `docs/` phải phản ánh suy luận của bạn, không phải output thô từ Claude.
 
 ---
 
