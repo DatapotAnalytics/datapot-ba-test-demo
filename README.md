@@ -1,4 +1,4 @@
-# BA Take-Home — Hệ thống quản lý lịch dạy
+# Datapot BA Test — Hệ thống quản lý lịch dạy
 
 ## 1. Đề bài (tóm tắt)
 
@@ -18,11 +18,15 @@ Bạn được yêu cầu phân tích và prototype một **hệ thống quản 
 
 | Output | File | Mô tả |
 |---|---|---|
+| Dataset Contract | `docs/00-dataset-contract.md` | Giả định dữ liệu đầu vào từ bước 1 & 3 |
 | Requirements | `docs/01-requirements.md` | Problem statement, actors, assumptions, glossary |
 | User Stories | `docs/02-user-stories.md` | Stories theo format Given/When/Then + MoSCoW |
 | Process Flow | `docs/03-process-flow.md` | Sơ đồ luồng bằng Mermaid |
-| Data Model / ERD | `docs/04-data-model.md` | ERD bằng Mermaid + mô tả entity |
+| Data Model / ERD | `docs/04-data-model.md` | ERD bằng Mermaid + data dictionary field-level |
+| Screen Spec | `docs/05-screen-spec.md` | Spec từng màn: câu hỏi nghiệp vụ, dữ liệu, hành động |
 | Prototype tương tác | `prototype/index.html` | 3 màn cốt lõi, mở được trực tiếp trên browser |
+
+> **Thứ tự khuyến nghị:** điền `00` (dataset contract) trước — giả định dữ liệu ảnh hưởng đến toàn bộ thiết kế phía sau. Xem chi tiết quy trình trong [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ---
 
@@ -30,11 +34,12 @@ Bạn được yêu cầu phân tích và prototype một **hệ thống quản 
 
 1. **Fork** repo này về tài khoản GitHub cá nhân của bạn (nút **Fork** góc trên bên phải).
 2. Clone về máy, làm bài trực tiếp trên nhánh `main`.
-3. Mở và điền nội dung vào các file trong thư mục `docs/`:
+3. Điền theo thứ tự trong `docs/`: bắt đầu từ `00-dataset-contract.md` để xác định giả định dữ liệu, rồi lần lượt các file `01` → `05`.
    - Xóa các placeholder `<<< ... >>>` và thay bằng phân tích của bạn.
    - Xóa ví dụ mẫu (có nhãn "ví dụ — xóa") và thay bằng nội dung thực.
-4. Mở rộng prototype trong `prototype/` — hoàn thiện luồng, bổ sung validation, thêm màn nếu cần.
-5. Commit và push thường xuyên để Ban tổ chức có thể theo dõi tiến độ.
+4. Mở rộng prototype trong `prototype/` — implement theo `docs/05-screen-spec.md`, hoàn thiện luồng, bổ sung validation.
+5. Commit và push thường xuyên để Ban tổ chức có thể theo dõi tiến độ tư duy.
+6. Xem [CONTRIBUTING.md](CONTRIBUTING.md) để biết commit style và checklist nộp bài.
 
 ---
 
@@ -43,7 +48,7 @@ Bạn được yêu cầu phân tích và prototype một **hệ thống quản 
 Không cần cài đặt bất kỳ thứ gì. Mở file `prototype/index.html` bằng trình duyệt (Chrome / Edge / Firefox) là chạy được ngay.
 
 ```
-ba-take-home/
+datapot-ba-test-demo/
 └── prototype/
     └── index.html   ← mở file này
 ```
@@ -62,10 +67,12 @@ ba-take-home/
 
 ## 6. Checklist trước khi nộp
 
+- [ ] `docs/00-dataset-contract.md` — đã điền thực thể đầu vào, fields, và ràng buộc.
 - [ ] `docs/01-requirements.md` — đã điền đầy đủ: problem statement, actors, scope, assumptions, glossary.
 - [ ] `docs/02-user-stories.md` — có ít nhất **3 user story** cho mỗi bước (2, 4, 5); mỗi story có AC (Given/When/Then) và priority MoSCoW.
 - [ ] `docs/03-process-flow.md` — có ít nhất **2 sơ đồ luồng** chính (xác nhận lịch & yêu cầu thay đổi) vẽ bằng Mermaid.
-- [ ] `docs/04-data-model.md` — ERD phản ánh đúng luồng nghiệp vụ, có mô tả thuộc tính từng entity.
-- [ ] `prototype/index.html` — mở được ngay trên browser, 3 màn cốt lõi hoạt động (xác nhận, thay đổi, lịch cá nhân).
+- [ ] `docs/04-data-model.md` — ERD + data dictionary field-level (tên, kiểu, nullable, mô tả, ví dụ).
+- [ ] `docs/05-screen-spec.md` — đã spec đủ 3 màn: câu hỏi nghiệp vụ, dữ liệu, hành động, filter.
+- [ ] `prototype/index.html` — mở được ngay trên browser, 3 màn cốt lõi hoạt động.
 - [ ] Repo đặt ở **Public** (hoặc đã add reviewer theo yêu cầu của BTC).
 - [ ] Đã gửi link repo cho Ban tổ chức.
