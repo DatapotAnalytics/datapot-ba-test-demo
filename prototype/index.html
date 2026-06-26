@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hệ thống quản lý lịch dạy — Prototype</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <header>
+    <div class="header-inner">
+      <span class="logo">Lịch Dạy</span>
+      <nav class="tabs" role="tablist">
+        <button class="tab active" data-tab="confirm" role="tab">Xác nhận lịch</button>
+        <button class="tab" data-tab="change" role="tab">Thay đổi lịch</button>
+        <button class="tab" data-tab="calendar" role="tab">Lịch của tôi</button>
+      </nav>
+      <div class="role-switcher">
+        <label for="role-select">Vai trò:</label>
+        <select id="role-select">
+          <option value="gv">Giảng viên (GV)</option>
+          <option value="ta">Trợ giảng (TA)</option>
+          <option value="coordinator">Coordinator</option>
+        </select>
+      </div>
+    </div>
+  </header>
+
+  <main>
+
+    <!-- TAB 1: Xác nhận lịch -->
+    <section id="tab-confirm" class="tab-content active">
+      <div class="section-header">
+        <h2>Xác nhận lịch dạy</h2>
+        <span class="todo-note">TODO: thêm bộ lọc trạng thái, thông báo real-time khi có buổi mới</span>
+      </div>
+      <div id="session-list"></div>
+    </section>
+
+    <!-- TAB 2: Thay đổi lịch -->
+    <section id="tab-change" class="tab-content">
+      <div class="section-header">
+        <h2>Thay đổi lịch</h2>
+        <span class="todo-note">TODO: thêm validation, thông báo khi Coordinator phê duyệt/từ chối</span>
+      </div>
+
+      <div class="panel">
+        <h3>Gửi yêu cầu thay đổi</h3>
+        <form id="change-form">
+          <div class="form-row">
+            <label for="cr-session">Buổi học:</label>
+            <select id="cr-session"></select>
+          </div>
+          <div class="form-row">
+            <label for="cr-type">Loại yêu cầu:</label>
+            <select id="cr-type">
+              <option value="reschedule">Đổi lịch</option>
+              <option value="cancel">Hủy buổi</option>
+            </select>
+          </div>
+          <div class="form-row" id="cr-newdate-row">
+            <label for="cr-newdate">Ngày mới đề xuất:</label>
+            <input type="date" id="cr-newdate" />
+          </div>
+          <div class="form-row">
+            <label for="cr-reason">Lý do:</label>
+            <textarea id="cr-reason" rows="3" placeholder="Nhập lý do..."></textarea>
+          </div>
+          <div class="form-row">
+            <label></label>
+            <button type="submit" class="btn btn-primary">Gửi yêu cầu</button>
+          </div>
+        </form>
+      </div>
+
+      <div class="panel">
+        <h3>Danh sách yêu cầu đang chờ phê duyệt</h3>
+        <div id="change-request-list"></div>
+      </div>
+    </section>
+
+    <!-- TAB 3: Lịch cá nhân -->
+    <section id="tab-calendar" class="tab-content">
+      <div class="section-header">
+        <h2>Lịch của tôi</h2>
+        <span class="todo-note">TODO: điều hướng tuần/tháng, lọc theo actor, xuất lịch</span>
+      </div>
+      <div id="week-grid"></div>
+      <h3 class="list-heading">Danh sách buổi dạy</h3>
+      <div id="personal-list"></div>
+    </section>
+
+  </main>
+
+  <!-- Modal: Từ chối lịch -->
+  <div id="reject-modal" class="modal-backdrop hidden" role="dialog" aria-modal="true">
+    <div class="modal">
+      <h3>Từ chối buổi dạy</h3>
+      <label for="reject-reason">Lý do từ chối:</label>
+      <textarea id="reject-reason" rows="3" placeholder="Nhập lý do..."></textarea>
+      <div class="modal-actions">
+        <button id="reject-cancel-btn" class="btn">Hủy</button>
+        <button id="reject-confirm-btn" class="btn btn-danger">Xác nhận từ chối</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
