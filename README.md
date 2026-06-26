@@ -45,100 +45,118 @@ Bạn được yêu cầu phân tích và prototype một **hệ thống quản 
 
 ## 4. Skills & công cụ theo từng phase
 
-> Bạn được khuyến khích dùng bất kỳ công cụ nào — kể cả AI. Bảng dưới gợi ý các kỹ năng và tool phù hợp cho từng phase để bài làm chuyên nghiệp hơn.
+> Bạn được khuyến khích dùng Claude ở mọi phase. Bảng dưới chỉ rõ **kỹ năng BA cốt lõi** và **task cụ thể nên giao cho Claude** ở từng bước.
 
-| Phase | Deliverable | Kỹ năng cốt lõi | Tool gợi ý |
+| Phase | Kỹ năng BA cốt lõi | Tool khác | Dùng Claude để… |
 |---|---|---|---|
-| **00** Dataset Contract | `docs/00-dataset-contract.md` | System boundary analysis · Data contract design | Notion / Confluence · AI (Claude) để draft |
-| **01** Requirements | `docs/01-requirements.md` | Stakeholder analysis · Problem framing · Scope negotiation | AI (Claude) để cấu trúc · Notion |
-| **02** User Stories | `docs/02-user-stories.md` | Story mapping · BDD (Given/When/Then) · MoSCoW prioritization | AI (Claude) để draft story · Jira / Linear để track |
-| **03** Process Flow | `docs/03-process-flow.md` | BPMN · Swimlane diagram · Decision tree | **Mermaid** (có sẵn trong repo) · Miro · Lucidchart |
-| **04** Data Model | `docs/04-data-model.md` | ER modeling · Normalization · Cardinality | **Mermaid erDiagram** (có sẵn) · dbdiagram.io · AI để review logic |
-| **05** Screen Spec | `docs/05-screen-spec.md` | Information architecture · UX thinking · Wireframing | Figma · Whimsical · Balsamiq · AI để gợi ý layout |
-| **Prototype** | `prototype/index.html` | HTML · CSS · Vanilla JS · Accessibility cơ bản | **Claude Code** để generate khung · VS Code · Chrome DevTools |
+| **00** Dataset Contract | System boundary analysis · Data contract design | Notion | Phân tích đề bài → liệt kê entity upstream cần cung cấp, fields, types, constraints; phân biệt bước 1 tạo gì vs bước 3 cập nhật gì |
+| **01** Requirements | Problem framing · Scope negotiation · Stakeholder analysis | Notion | Từ đề bài + dataset contract → draft actors, functional requirements từng bước, non-functional requirements; sinh ra 5 câu hỏi cần hỏi thêm stakeholder |
+| **02** User Stories | Story mapping · BDD · MoSCoW prioritization | Jira / Linear | Draft stories theo Given/When/Then → sau đó hỏi: *"Story này AC còn thiếu điều kiện gì? Đã có unhappy path chưa?"* |
+| **03** Process Flow | BPMN · Swimlane · Decision tree | Miro · Lucidchart | Mô tả luồng bằng text → generate Mermaid flowchart → hỏi tiếp: *"Luồng này bỏ sót nhánh nào?"* |
+| **04** Data Model | ER modeling · Normalization · Cardinality | dbdiagram.io | Từ contract + stories → generate Mermaid erDiagram → review: normalization issues, entity còn thiếu để support state transitions |
+| **05** Screen Spec | Information architecture · UX thinking | Figma · Whimsical | Từ stories từng bước → spec màn hình: *câu hỏi nghiệp vụ cần trả lời, data fields, actions, filters, empty state, error state* |
+| **Prototype** | HTML · CSS · Vanilla JS | VS Code · Chrome DevTools | Paste screen spec → generate khung HTML/CSS/JS với dữ liệu mẫu, TODO comments chỗ cần hoàn thiện; iterate từng màn một |
 
-**Ghi chú về AI-assisted workflow:**
-- AI (Claude, ChatGPT...) rất hiệu quả để **draft nhanh** requirements, stories, và spec — nhưng bạn phải **review và điều chỉnh** cho đúng nghiệp vụ.
-- Reviewer sẽ đánh giá **tư duy phân tích** của bạn, không phải AI. Nội dung AI generate mà không có suy luận cá nhân sẽ dễ nhận ra.
-- Dùng **Claude Code** để generate prototype HTML là hoàn toàn hợp lệ — nhưng bạn cần hiểu và có thể giải thích code đó.
+> **Lưu ý đánh giá:** Reviewer đánh giá **tư duy phân tích và lý luận nghiệp vụ** của bạn — không phải khả năng prompt AI.
+> Nội dung Claude generate nhưng không có dấu ấn phân tích cá nhân sẽ dễ nhận ra. Hãy dùng Claude như một sparring partner: draft nhanh → bạn challenge lại → iterate.
 
 ---
 
-## 5. Guideline — Sản phẩm sẵn sàng cho Dev
+## 5. Cách tiếp cận repo này — từng bước
 
-> Phần này dành cho ứng viên muốn đẩy bài làm lên mức **dev-ready**: tài liệu đủ để một developer bắt tay implement mà không cần hỏi lại BA về logic nghiệp vụ.
+> Đây là thứ tự được khuyến nghị khi bạn vừa fork repo này về. Mỗi bước có lý do — đừng bỏ qua hay đảo thứ tự.
 
-Ngoài 6 deliverable cơ bản, một bài hoàn chỉnh cho dev cần thêm:
+### Bước 1 — Đọc và hiểu bộ khung trước khi viết bất cứ điều gì *(~20 phút)*
 
-### 5.1 State Machine — Sơ đồ trạng thái
+- Đọc README từ đầu đến cuối (bao gồm mục này).
+- Mở `prototype/index.html` trên browser — dùng thử như GV, TA, Coordinator. Đây là điểm xuất phát, không phải đích đến.
+- Lướt qua tất cả file trong `docs/` — đừng điền vội, chỉ đọc để nắm cấu trúc khung.
+- Đọc `CONTRIBUTING.md` để biết commit style và thứ tự làm việc.
 
-Vẽ sơ đồ trạng thái cho **Session** và **ChangeRequest** — developer cần biết chính xác mọi chuyển trạng thái hợp lệ và điều kiện trigger.
+### Bước 2 — Phân tích bài toán trước khi mở editor *(~20 phút)*
 
-```mermaid
-stateDiagram-v2
-  [*] --> pending : bước 1 tạo & phân công
-  pending --> confirmed : GV/TA xác nhận
-  pending --> rejected  : GV/TA từ chối (kèm lý do)
-  confirmed --> [*]
-  rejected --> [*]
-```
+Dùng giấy, whiteboard, hoặc Miro — không phải bàn phím.
 
-> Thêm state diagram vào `docs/03-process-flow.md` hoặc tạo file riêng `docs/06-state-machine.md`.
+- Vẽ nháp **system boundary**: bước 1 và bước 3 kết thúc ở đâu, bước 2, 4, 5 của bạn bắt đầu ở đâu?
+- Xác định **dữ liệu nào đã tồn tại** khi hệ thống của bạn nhận vào.
+- Ghi ra ít nhất **3 câu hỏi chưa rõ** — đây sẽ trở thành phần Assumptions và Câu hỏi mở trong docs.
 
-### 5.2 Permission Matrix — Ma trận phân quyền
+> **Claude prompt gợi ý:** *"Đây là đề bài: [paste]. Vẽ system boundary: input gì từ upstream, output gì ra ngoài, scope của tôi ở đâu trong luồng 5 bước?"*
 
-Ai được làm gì? Developer cần bảng này để implement authorization.
+### Bước 3 — Dataset Contract (`docs/00-dataset-contract.md`) *(làm trước tiên)*
 
-| Hành động | Coordinator | GV | TA |
-|---|:---:|:---:|:---:|
-| Xem lịch tổng tất cả người | ✅ | ❌ | ❌ |
-| Xem lịch cá nhân của mình | ✅ | ✅ | ✅ |
-| Xác nhận / từ chối buổi | ❌ | ✅ | ✅ |
-| Gửi yêu cầu thay đổi | ❌ | ✅ | ✅ |
-| Phê duyệt / từ chối yêu cầu thay đổi | ✅ | ❌ | ❌ |
-| <<< thêm hành động >>> | | | |
+Đây là nền tảng của mọi thiết kế phía sau. Nếu giả định dữ liệu sai ở đây, requirements, ERD, và prototype đều sai theo.
 
-> Bổ sung vào `docs/01-requirements.md` hoặc `docs/05-screen-spec.md`.
+- Liệt kê từng entity upstream cung cấp, kèm fields, types, nullable, ví dụ.
+- Ghi rõ bước 1 tạo gì, bước 3 cập nhật gì.
+- Ghi câu hỏi mở về dữ liệu nếu chưa chắc.
 
-### 5.3 Notification Design — Ai nhận thông báo, khi nào
+> **Claude prompt gợi ý:** *"Từ đề bài trên, liệt kê entity nào bước 1 và bước 3 cần cung cấp cho hệ thống tôi, với field name, type, nullable, ví dụ giá trị thực."*
 
-Developer cần biết trigger + recipient + nội dung để implement.
+### Bước 4 — Requirements rồi mới đến Stories (`docs/01` → `docs/02`)
 
-| Sự kiện | Trigger | Người nhận | Nội dung thông báo |
-|---|---|---|---|
-| Buổi mới được phân công | Bước 1 tạo Assignment | GV + TA | "Bạn được phân công buổi [X] vào [ngày]" |
-| GV/TA xác nhận | status → confirmed | Coordinator | "[Tên] đã xác nhận buổi [X]" |
-| GV/TA từ chối | status → rejected | Coordinator | "[Tên] từ chối buổi [X]: [lý do]" |
-| Yêu cầu thay đổi mới | ChangeRequest tạo | Coordinator | "[Tên] yêu cầu [đổi/hủy] buổi [X]" |
-| Coordinator phê duyệt | status → approved | GV + TA | "Yêu cầu thay đổi buổi [X] được chấp thuận" |
-| Coordinator từ chối | status → rejected | GV + TA | "Yêu cầu thay đổi buổi [X] bị từ chối" |
-| <<< thêm sự kiện >>> | | | |
+Không viết đồng thời — requirements xong trước, stories viết sau dựa trên requirements.
 
-### 5.4 Edge Cases & Validation Rules
+- Mỗi user story phải trace được về ít nhất 1 functional requirement.
+- Kiểm tra mỗi AC (Given/When/Then) có **testable** không — nếu không test được thì AC chưa rõ.
 
-Liệt kê các trường hợp biên mà developer cần xử lý. Ví dụ:
+> **Claude prompt gợi ý (Requirements):** *"Từ đề bài và dataset contract, liệt kê: actors, functional requirements từng bước, non-functional requirements gợi ý, 5 câu hỏi cần hỏi thêm stakeholder."*
+>
+> **Claude prompt gợi ý (Stories):** *"Từ requirements này, draft user stories Given/When/Then với MoSCoW. Sau đó challenge: story nào AC còn thiếu điều kiện, story nào chưa có unhappy path?"*
 
-- Nếu GV từ chối → Coordinator có được tái phân công người khác không?
-- Nếu buổi đã `confirmed` mà GV gửi yêu cầu hủy → flow khác gì so với buổi `pending`?
-- Một GV có thể có nhiều yêu cầu thay đổi đang `pending` cùng lúc không?
-- Yêu cầu `reschedule` được approve → ngày mới do ai cập nhật vào Session?
-- <<< thêm edge case >>>
+### Bước 5 — Process Flow (`docs/03-process-flow.md`)
 
-> Bổ sung vào `docs/01-requirements.md` phần Assumptions, hoặc tạo `docs/06-edge-cases.md`.
+- Vẽ **Happy Path trước**, rồi mới thêm nhánh từ chối / lỗi / timeout.
+- Đảm bảo mỗi trạng thái trong luồng nhất quán với stories ở bước 4.
+- Tối thiểu 2 luồng: xác nhận lịch và yêu cầu thay đổi.
 
-### 5.5 API Sketch (tùy chọn — điểm cộng)
+> **Claude prompt gợi ý:** *"Mô tả luồng [xác nhận lịch] bằng text: [mô tả]. Generate Mermaid flowchart bao gồm happy path và tất cả nhánh. Sau đó: luồng này bỏ sót trường hợp nào?"*
 
-Phác thảo các endpoint chính để developer hiểu boundary hệ thống. Không cần đầy đủ — chỉ cần đủ để align.
+### Bước 6 — Data Model (`docs/04-data-model.md`)
 
-```
-GET    /sessions?userId=&status=          # lấy danh sách buổi
-PATCH  /assignments/:id/confirm           # xác nhận
-PATCH  /assignments/:id/reject            # từ chối (body: reason)
-POST   /change-requests                   # gửi yêu cầu thay đổi
-PATCH  /change-requests/:id/approve       # Coordinator phê duyệt
-PATCH  /change-requests/:id/reject        # Coordinator từ chối
-GET    /sessions/calendar?userId=&week=   # lịch tuần
-```
+- **Bắt đầu từ entities trong Dataset Contract** (bước 3), không phải từ không khí.
+- Sau khi có ERD, tự hỏi: model này hỗ trợ được tất cả state transitions trong Process Flow không?
+- Điền data dictionary field-level (tên, kiểu, nullable, mô tả, ví dụ) — không chỉ tên entity.
+
+> **Claude prompt gợi ý:** *"Từ dataset contract và user stories này, generate Mermaid erDiagram. Kiểm tra: normalization có vấn đề gì, thiếu entity nào để support state transitions, cardinality có đúng không?"*
+
+### Bước 7 — Screen Spec (`docs/05-screen-spec.md`) — spec TRƯỚC khi code
+
+Viết spec trước, code sau — đừng code prototype rồi viết spec ngược lại.
+
+- Mỗi màn phải trả lời được câu hỏi: *"Người dùng đến màn này để biết gì / làm gì?"*
+- Liệt kê data fields, actions, filters, empty state, error state cho từng màn.
+
+> **Claude prompt gợi ý:** *"Từ stories bước [2], spec màn Xác nhận lịch: ai xem, câu hỏi nghiệp vụ cần trả lời, data fields hiển thị, actions người dùng có thể thực hiện, filters, empty state khi không có buổi nào."*
+
+### Bước 8 — Mở rộng Prototype
+
+- Implement đúng theo spec trong `docs/05-screen-spec.md` — không thêm feature ngoài spec.
+- Test từng luồng bằng cách **dùng thử như từng role**: GV, TA, Coordinator.
+- Commit sau mỗi màn hoàn thiện — không gom thành 1 commit lớn cuối cùng.
+
+> **Claude Code prompt gợi ý:** *"Đây là screen spec màn [Xác nhận lịch]: [paste spec]. Generate HTML/CSS/JS implement màn này, dữ liệu mẫu hardcode trong JS, TODO comments chỗ cần hoàn thiện."*
+
+### Bước 9 — Dev-readiness review *(điểm cộng)*
+
+Tự hỏi: *"Nếu tôi đưa bộ tài liệu này cho developer ngay bây giờ, họ có thể bắt đầu code mà không cần hỏi lại gì không?"*
+
+Nếu chưa, bổ sung thêm:
+
+| Artifact | Đặt ở đâu | Developer cần để làm gì |
+|---|---|---|
+| **State machine** — sơ đồ chuyển trạng thái Session & ChangeRequest | `docs/03-process-flow.md` hoặc `docs/06-state-machine.md` | Implement trạng thái & transitions chính xác |
+| **Permission matrix** — ai được làm gì (✅/❌ theo role) | `docs/01-requirements.md` hoặc `docs/05-screen-spec.md` | Implement authorization |
+| **Notification design** — trigger → recipient → nội dung | `docs/05-screen-spec.md` | Implement hệ thống thông báo |
+| **Edge cases & validation rules** — trường hợp biên và ràng buộc | `docs/01-requirements.md` | Không bỏ sót case khi code |
+| **API sketch** *(optional)* — phác thảo endpoint | Inline trong `docs/05-screen-spec.md` | Align backend/frontend boundary sớm |
+
+### Bước 10 — Final review trước khi nộp
+
+- Đọc lại toàn bộ `docs/` một lần — kiểm tra nhất quán: stories ↔ process flow ↔ data model ↔ screen spec.
+- Mở prototype, chạy lại từng luồng chính.
+- Run through Checklist mục 8.
+- Push lần cuối — gửi link.
 
 ---
 
